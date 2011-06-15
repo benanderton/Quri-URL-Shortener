@@ -1,0 +1,5 @@
+Quri URL Shortener
+============
+
+Takes a URL, adds it to a database and gives the user a short URL with a unique hash which lets them access it later. Any traffic passing through the shortened URL is logged for end user statistics.
+
