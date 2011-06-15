@@ -29,7 +29,14 @@ URL shortening platform written in CakePHP 1.3. Takes a URL, adds it to a databa
 * User account system.
 * API for use with other software.
 * Integration with social media services (Ie share with..)
-* Publicly available information (prepend the slug with /stat/ to show the original URL and other data, know what you're clicking before you click)
+* [DONE] Publicly available information (prepend the slug with /stat/ to show the original URL and other data, know what you're clicking before you click)
+
+## Change log
+
+### 0.15
+* Public information now available at foob.ar/i/slug
+* Made prefixes for information and statistics on URLs shorter, they're now /s/ for statistics and /i/ for information.
+* Added validation to the add page to ensure only URLs are entered.
 
 _— [Ben](benanderton@gmail.com)_
 
