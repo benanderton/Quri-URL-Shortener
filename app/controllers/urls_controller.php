@@ -1,25 +1,28 @@
 <?php
+
+App::import('Sanitize');
+
 class UrlsController extends AppController {
 
 	var $name = 'Urls';
 	var $helpers = array('GoogleCharts');
 	var $components = array('Geoip');
 
-	function index() {
-		$this->Url->recursive = 0;
-		$this->set('urls', $this->paginate());
-	}
-
-	function view($id = null) {
-		if (!$id) {
+	function view($hash = null) {
+		if (!$hash) {
 			$this->Session->setFlash(__('Invalid url', true));
-			$this->redirect(array('action' => 'index'));
+			$this->redirect(array('action' => 'add'));
 		}
-		$this->set('url', $this->Url->read(null, $id));
+		$this->set('url', $this->Url->find('first', array('conditions' => array('hash' => $hash))));
 	}
 
 	function add() {
+		$this->layout = 'home';
 		if (!empty($this->data)) {
+			if(!stristr($this->data['Url']['original'], 'http://') && !stristr($this->data['Url']['original'], 'https://')) {
+				$this->data['Url']['original'] = 'http://' . $this->data['Url']['original'];
+			}
+			$this->data['Url']['original'] = Sanitize::paranoid($this->data['Url']['original'], array('/', ':', '.', '&', '-', '_', '@'));
 			if ($this->Url->save($this->data)) {
 				$id = $this->Url->saveHashed();
 				$url = $this->Url->find('first', array('conditions' => array('Url.id' => $id)));
@@ -33,48 +36,15 @@ class UrlsController extends AppController {
 		$this->set(compact('users'));
 	}
 
-	function edit($id = null) {
-		if (!$id && empty($this->data)) {
-			$this->Session->setFlash(__('Invalid url', true));
-			$this->redirect(array('action' => 'index'));
-		}
-		if (!empty($this->data)) {
-			if ($this->Url->save($this->data)) {
-				$this->Session->setFlash(__('The url has been saved', true));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The url could not be saved. Please, try again.', true));
-			}
-		}
-		if (empty($this->data)) {
-			$this->data = $this->Url->read(null, $id);
-		}
-		$users = $this->Url->User->find('list');
-		$this->set(compact('users'));
-	}
+	function show($hash = null) {
 
-	function delete($id = null) {
-		if (!$id) {
-			$this->Session->setFlash(__('Invalid id for url', true));
-			$this->redirect(array('action'=>'index'));
-		}
-		if ($this->Url->delete($id)) {
-			$this->Session->setFlash(__('Url deleted', true));
-			$this->redirect(array('action'=>'index'));
-		}
-		$this->Session->setFlash(__('Url was not deleted', true));
-		$this->redirect(array('action' => 'index'));
-	}
-
-	function show($id = null) {
-
-		if ($id == null) {
+		if ($hash == null) {
 			$this->redirect(array('action'=>'add'));
 		}
 
 		$url = $this->Url->find('first', array(
-			'conditions' => array('hash' => $id),
-			'fields' => array('original')
+			'conditions' => array('hash' => $hash),
+			'fields' => array('original', 'id')
 		));
 		if($url != null) {
 			$this->loadModel('Stat');
@@ -84,12 +54,12 @@ class UrlsController extends AppController {
 				'time' => date('Y-m-d\TH:i:s.uP', time()),
 				'useragent' => $_SERVER['HTTP_USER_AGENT'],
 				'referer' => (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'N/A')
-			), $id);
+			), $url['Url']['id']);
 			$this->redirect($url['Url']['original']);
 		}
 
-		$this->Session->setFlash('URL Not found', true);
-		$this->redirect(array('action' => 'index'));
+		$this->Session->setFlash('The reqested Quri has no statistics at this time', true);
+		$this->redirect(array('action' => 'add'));
 	}
 }
 ?>

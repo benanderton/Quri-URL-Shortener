@@ -1,19 +1,13 @@
-<div class="urls form">
-<?php echo $this->Form->create('Url');?>
-	<fieldset>
-		<legend><?php __('Add Url'); ?></legend>
-	<?php
-		echo $this->Form->input('original');
-	?>
-	</fieldset>
-<?php echo $this->Form->end(__('Submit', true));?>
-</div>
-<div class="actions">
-	<h3><?php __('Actions'); ?></h3>
-	<ul>
+<?php $this->Html->script(array('https://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js', 'add.js'), array('inline'=>false)) ?>
 
-		<li><?php echo $this->Html->link(__('List Urls', true), array('action' => 'index'));?></li>
-		<li><?php echo $this->Html->link(__('List Users', true), array('controller' => 'users', 'action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New User', true), array('controller' => 'users', 'action' => 'add')); ?> </li>
-	</ul>
-</div>
+
+<?php echo $this->Form->create('Url');?>
+	<?php echo $this->Form->input('original', array('class' => 'input', 'label' => false, 'div' => false)); ?>
+<?php 
+$options = array(
+	'label' => false,
+	'value' => 'SUBMITTTTT',
+	'div' => false,
+	'class' => 'submit');
+echo $this->Form->end($options);
+?>

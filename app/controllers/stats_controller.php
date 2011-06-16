@@ -8,9 +8,17 @@ class StatsController extends AppController {
 		
 		if(!$id){
 			$this->Session->setFlash('No stats for this Quri', true);
-			$this->redirect(array('controller' => 'urls', 'action' => 'index'));
+			$this->redirect(array('controller' => 'url', 'action' => 'add'));
 		}
+		$this->loadModel('Url');
+		$url = $this->Url->find('first', array('fields' => array('id'), 'conditions' => array('hash' => $id)));
+		$id = $url['Url']['id'];
 		$stats = $this->Stat->find('all', array('conditions' => array('url_id' => $id)));
+
+		if(!$stats) {
+			$this->Session->setFlash('No stats yet for that URL');
+			$this->Redirect(array('controller' => 'url', 'action' => 'add'));
+		}
 		$this->Stat->recursive = 0;
 		$this->set(array(
 			'stats' => $stats,
@@ -19,61 +27,6 @@ class StatsController extends AppController {
 			'countryPie' => $this->getCountryPieData($id),
 			'useragentPie' => $this->getUserAgentPieData($id)
 		));
-	}
-
-	function view($id = null) {
-		if (!$id) {
-			$this->Session->setFlash(__('Invalid stat', true));
-			$this->redirect(array('action' => 'index'));
-		}
-		$this->set('stat', $this->Stat->read(null, $id));
-	}
-
-	function add() {
-		if (!empty($this->data)) {
-			$this->Stat->create();
-			if ($this->Stat->save($this->data)) {
-				$this->Session->setFlash(__('The stat has been saved', true));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The stat could not be saved. Please, try again.', true));
-			}
-		}
-		$urls = $this->Stat->Url->find('list');
-		$this->set(compact('urls'));
-	}
-
-	function edit($id = null) {
-		if (!$id && empty($this->data)) {
-			$this->Session->setFlash(__('Invalid stat', true));
-			$this->redirect(array('action' => 'index'));
-		}
-		if (!empty($this->data)) {
-			if ($this->Stat->save($this->data)) {
-				$this->Session->setFlash(__('The stat has been saved', true));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The stat could not be saved. Please, try again.', true));
-			}
-		}
-		if (empty($this->data)) {
-			$this->data = $this->Stat->read(null, $id);
-		}
-		$urls = $this->Stat->Url->find('list');
-		$this->set(compact('urls'));
-	}
-
-	function delete($id = null) {
-		if (!$id) {
-			$this->Session->setFlash(__('Invalid id for stat', true));
-			$this->redirect(array('action'=>'index'));
-		}
-		if ($this->Stat->delete($id)) {
-			$this->Session->setFlash(__('Stat deleted', true));
-			$this->redirect(array('action'=>'index'));
-		}
-		$this->Session->setFlash(__('Stat was not deleted', true));
-		$this->redirect(array('action' => 'index'));
 	}
 
 	/**

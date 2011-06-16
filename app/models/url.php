@@ -35,7 +35,7 @@ class Url extends AppModel {
 		$data = array(
            'Url' => array(
                         'id'     =>    $id,
-                        'hash'   =>    base_convert($id, 10, 16)
+                        'hash'   =>    base64_encode(base_convert($id, 10, 36))
            )
         );
 
